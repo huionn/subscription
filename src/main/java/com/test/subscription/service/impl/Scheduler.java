@@ -2,7 +2,7 @@ package com.test.subscription.service.impl;
 
 import java.time.LocalDate;
 import java.time.chrono.IsoChronology;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,8 +29,10 @@ public class Scheduler {
 		case WEEKLY:
 			if (startDate.getDayOfWeek().getValue() != firstDay) {
 				if (firstDay > startDate.getDayOfWeek().getValue()) {
+					//fall in this week
 					firstDate = startDate.plusDays(firstDay - startDate.getDayOfWeek().getValue());
 				} else {
+					//fall in next week
 					firstDate = startDate.plusDays(firstDay + 7 - startDate.getDayOfWeek().getValue());
 				}
 			} else {
@@ -38,13 +40,10 @@ public class Scheduler {
 			}
 			break;
 		case MONTHLY:
-			if (startDate.getDayOfMonth() != firstDay) {
-				if (firstDay > startDate.getDayOfMonth()) {
-					firstDate = resolvePreviousValid(startDate.getYear(), startDate.getMonthValue(), firstDay);
-				} else {
-					LocalDate nextMonth = startDate.plusMonths(1);
-					firstDate = resolvePreviousValid(nextMonth.getYear(), nextMonth.getMonthValue(), firstDay);
-				}
+			if (firstDay < startDate.getDayOfMonth()) {
+				// adjust if the first day fall into next month
+				LocalDate nextMonth = startDate.plusMonths(1);
+				firstDate = resolvePreviousValid(nextMonth.getYear(), nextMonth.getMonthValue(), firstDay);
 			} else {
 				firstDate = startDate;
 			}
@@ -55,21 +54,21 @@ public class Scheduler {
 			break;
 		}
 
+		if (firstDate.isAfter(duration.getEndDate())) {
+			// no match date (day of week/month does not fit into the duration range)
+			return Collections.emptyList();
+		}
+
 		// add 1 day in end date to make original end date inclusive
 		LocalDate exclusiveEndDate = duration.getEndDate().plusDays(1);
 		if (type != SubscriptionType.MONTHLY) {
 			// for DAILY and WEEKLY subscription
 			return firstDate.datesUntil(exclusiveEndDate, type.getPeriod()).collect(Collectors.toList());
 		} else {
-			List<LocalDate> dates = new ArrayList<>();
-			// handle end of month e.g 29, 30, 31
-			for (LocalDate d = firstDate; d.isBefore(exclusiveEndDate); ) {
-				dates.add(d);
-				
-				LocalDate nextMonth = d.plusMonths(1);
-				d = resolvePreviousValid(nextMonth.getYear(), nextMonth.getMonthValue(), firstDay);
-			}
-			return dates;
+			// for MONTHLY subscription
+			return firstDate.datesUntil(exclusiveEndDate, type.getPeriod())
+					.map(d -> resolvePreviousValid(d.getYear(), d.getMonthValue(), firstDay))
+					.filter(exclusiveEndDate::isAfter).collect(Collectors.toList());
 		}
 
 	}

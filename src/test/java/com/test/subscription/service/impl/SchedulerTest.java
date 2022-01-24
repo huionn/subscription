@@ -27,6 +27,17 @@ class SchedulerTest {
 	}
 	
 	@Test
+	void testGenerateDatesDaily1Day() {
+		Scheduler s = new Scheduler();
+		
+		Duration d = new Duration(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 1, 1));
+		List<LocalDate> result = s.generateDates(d, 0, SubscriptionType.DAILY);
+		
+		assertEquals(1, result.size());
+		assertEquals(LocalDate.of(2022, 1, 1), result.get(0));
+	}
+	
+	@Test
 	void testGenerateDatesWeeklySimple() {
 		Scheduler s = new Scheduler();
 		
@@ -61,6 +72,17 @@ class SchedulerTest {
 		assertEquals(LocalDate.of(2022, 1, 2), result.get(0));
 		assertEquals(LocalDate.of(2022, 1, 30), result.get(result.size() - 1));
 	}
+	
+	@Test
+	void testGenerateDatesWeeklyNone() {
+		Scheduler s = new Scheduler();
+		
+		Duration d = new Duration(LocalDate.of(2022, 1, 2), LocalDate.of(2022, 1, 6));
+		List<LocalDate> result = s.generateDates(d, 6, SubscriptionType.WEEKLY);
+		
+		assertEquals(0, result.size());
+	}
+	
 	
 	@Test
 	void testGenerateDatesMonthlySimple() {
@@ -98,6 +120,38 @@ class SchedulerTest {
 		assertEquals(LocalDate.of(2022, 1, 30), result.get(0));
 		assertEquals(LocalDate.of(2022, 2, 28), result.get(1));
 		assertEquals(LocalDate.of(2022, 3, 30), result.get(2));
+	}
+	
+	@Test
+	void testGenerateDatesMonthlyNextMonth() {
+		Scheduler s = new Scheduler();
+		
+		Duration d = new Duration(LocalDate.of(2022, 1, 30), LocalDate.of(2022, 3, 30));
+		List<LocalDate> result = s.generateDates(d, 3, SubscriptionType.MONTHLY);
+		
+		assertEquals(2, result.size());
+		assertEquals(LocalDate.of(2022, 2, 3), result.get(0));
+		assertEquals(LocalDate.of(2022, 3, 3), result.get(1));
+	}
+	
+	@Test
+	void testGenerateDatesMonthlyNone() {
+		Scheduler s = new Scheduler();
+		
+		Duration d = new Duration(LocalDate.of(2022, 1, 10), LocalDate.of(2022, 1, 20));
+		List<LocalDate> result = s.generateDates(d, 25, SubscriptionType.MONTHLY);
+		
+		assertEquals(0, result.size());
+	}
+	
+	@Test
+	void testGenerateDatesMonthlyNone2() {
+		Scheduler s = new Scheduler();
+		
+		Duration d = new Duration(LocalDate.of(2022, 1, 20), LocalDate.of(2022, 1, 30));
+		List<LocalDate> result = s.generateDates(d, 10, SubscriptionType.MONTHLY);
+		
+		assertEquals(0, result.size());
 	}
 
 }
