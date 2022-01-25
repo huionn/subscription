@@ -22,7 +22,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 		log.error("exception", ex);
-		String error = "Malformed JSON request: " + ex.getMessage();
+		String error = "Malformed JSON request: ";
+		Throwable mostSpecificCause = ex.getMostSpecificCause();		
+        if (mostSpecificCause != null) {
+        	error += mostSpecificCause.getMessage();
+        } else {
+        	error += ex.getMessage();
+        }
 		return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, error));
 	}
 

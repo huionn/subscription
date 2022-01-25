@@ -22,13 +22,13 @@ public class Duration {
 	@JsonFormat(pattern = "d/M/yyyy")
 	private LocalDate endDate;
 	
-	public boolean isValid() {
+	public void validate() {
 		if (endDate.isBefore(startDate)) {
-			return false;
+			throw new IllegalArgumentException("endDate must not be earlier than startDate");
 		}
 		if (endDate.isAfter(startDate.plusMonths(3).minusDays(1))) {
-			return false;
+			throw new IllegalArgumentException("duration must not be longer than 3 months");
 		}
-		return true;
+
 	}
 }

@@ -19,9 +19,7 @@ public class SimpleSubscriptionService implements SubscriptionService {
 
 	@Override
 	public SubscriptionResp register(SubscriptionReq req) {
-		if (!req.getDuration().isValid()) {
-			throw new IllegalArgumentException("duration is invalid");
-		}
+		req.getDuration().validate();
 		
 		SubscriptionResp resp = new SubscriptionResp();
 		
@@ -39,6 +37,9 @@ public class SimpleSubscriptionService implements SubscriptionService {
 		case MONTHLY:
 			if (req.getDayOfMonth() == 0) {
 				throw new IllegalArgumentException("dayOfMonth is required for MONTHLY subscription");
+			}
+			if (req.getDayOfMonth() < 1 || req.getDayOfMonth() > 31) {
+				throw new IllegalArgumentException("dayOfMonth must be 1 to 31");
 			}
 			firstDay = req.getDayOfMonth();
 			break;

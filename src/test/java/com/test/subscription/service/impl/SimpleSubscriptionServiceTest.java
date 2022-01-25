@@ -1,6 +1,6 @@
 package com.test.subscription.service.impl;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,12 +23,9 @@ class SimpleSubscriptionServiceTest {
 		d.setEndDate(LocalDate.of(2022, 4, 1)); // more than 3 months
 		req.setDuration(d);
 		req.setSubscriptionType(SubscriptionType.DAILY);
-		try {
-			s.register(req);
-			fail("should throw exception");
-		} catch (IllegalArgumentException e) {
-			// expected
-		}
+
+		assertThrows(IllegalArgumentException.class, () -> s.register(req));
+
 	}
 
 }

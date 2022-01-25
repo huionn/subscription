@@ -9,16 +9,18 @@ import org.junit.jupiter.api.Test;
 class DurationTest {
 
 	@Test
-	void testIsValid() {
+	void testValidate() {
 		Duration d = new Duration();
 		d.setStartDate(LocalDate.of(2022, 1, 1));
-		d.setEndDate(LocalDate.of(2022, 3, 31));
+		d.setEndDate(LocalDate.of(2022, 4, 30));
 		
-		assertTrue(d.isValid());
+		assertThrows(IllegalArgumentException.class, () -> d.validate());
 		
-		d.setEndDate(LocalDate.of(2022, 4, 1));
+		d.setEndDate(LocalDate.of(2021, 12, 31));
+		assertThrows(IllegalArgumentException.class, () -> d.validate());
 		
-		assertFalse(d.isValid());
+		d.setEndDate(LocalDate.of(2022, 3, 1));		
+		d.validate();
 	}
 
 }
