@@ -14,7 +14,7 @@ import lombok.Setter;
 public class SubscriptionResp {
 	private BigDecimal amount;
 	private SubscriptionType subscriptionType;
-	@JsonFormat(pattern = "d/M/yyyy")
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private List<LocalDate> invoiceDates;
 	
 }
